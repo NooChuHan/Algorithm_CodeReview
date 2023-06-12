@@ -33,7 +33,7 @@ function solution(genres, plays) {
     .map((v) => v[0]);
 
   // NOTE: 포멧에 맞게 엘범을 만든다.
-  let albums = zip(genres, plays).map((v, i) => {
+  const albums = zip(genres, plays).map((v, i) => {
     // NOTE: [고유번호, 장르, 재생횟수]
     return [i, ...v];
   });
