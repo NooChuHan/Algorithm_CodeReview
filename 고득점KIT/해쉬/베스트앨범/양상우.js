@@ -25,97 +25,99 @@
  * 장르별 재생횟수총합 분류
  *
  */
-function getTotalPlaysBasedOnGenres(genres, plays) {
-	const totalPlaysBasedOnGenres = new Map();
 
+/**
+ * countPlaysByGenres
+ *
+ * 장르별 재생횟수 총합을 구한다
+ *
+ * @param {string[]} genres
+ * @param {number[]} plays
+ * @returns {Object} countPlaysByGenres
+ */
+function countPlaysByGenres(genres, plays) {
+	const countPlaysByGenres = {};
+
+	// 장르별 재생횟수 총합을 구한다
 	for (let i = 0; i < genres.length; i++) {
 		const genre = genres[i];
 		const play = plays[i];
 
-		if (totalPlaysBasedOnGenres.has(genre)) {
-			totalPlaysBasedOnGenres.set(
-				genre,
-				totalPlaysBasedOnGenres.get(genre) + play
-			);
+		if (!countPlaysByGenres[genre]) {
+			countPlaysByGenres[genre] = play;
 		} else {
-			totalPlaysBasedOnGenres.set(genre, play);
+			countPlaysByGenres[genre] += play;
 		}
 	}
 
-	return totalPlaysBasedOnGenres;
+	return countPlaysByGenres;
 }
 
-function getSortedTotalPlaysBasedOnGenres(totalPlaysBasedOnGenres) {
-	const sortedTotalPlaysBasedOnGenres = [...totalPlaysBasedOnGenres]
+/**
+ * 	sortGenresByPlayCount
+ *
+ * 장르별 재생횟수 총합을 내림차순으로 정렬한다
+ *
+ * @param {Object} countPlaysByGenres
+ * @returns {string[]} sortedGenres
+ */
+function sortGenresByPlayCount(countPlaysByGenres) {
+	// 장르별 재생횟수 총합을 내림차순으로 정렬한다
+	const sortedGenres = Object.entries(countPlaysByGenres)
 		.sort((a, b) => b[1] - a[1])
 		.map((entry) => entry[0]);
 
-	return sortedTotalPlaysBasedOnGenres;
+	return sortedGenres;
 }
 
-function getIndexesBasedOnGenres(genres) {
-	const indexesBasedOnGenres = new Map();
+/**
+ * groupAlbumsByGenre
+ *
+ * 장르별 앨범을 그룹화한다
+ *
+ * @param {string[]} genres
+ * @param {number[]} plays
+ * @returns {Object} groupedAlbums
+ */
+function groupAlbumsByGenre(genres, plays) {
+	const albums = [];
 
 	for (let i = 0; i < genres.length; i++) {
-		const genre = genres[i];
+		albums.push({ id: i, genre: genres[i], play: plays[i] });
+	}
 
-		if (indexesBasedOnGenres.has(genre)) {
-			indexesBasedOnGenres.get(genre).push(i);
+	const groupedAlbums = albums.reduce((acc, album) => {
+		const { genre } = album;
+
+		if (!acc[genre]) {
+			acc[genre] = [album];
 		} else {
-			indexesBasedOnGenres.set(genre, [i]);
+			acc[genre].push(album);
 		}
-	}
 
-	return indexesBasedOnGenres;
+		return acc;
+	}, {});
+
+	return groupedAlbums;
 }
 
-function getSortedIndexesBasedOnPlays(indexesBasedOnGenres, plays) {
-	const sortedIndexesBasedOnPlays = new Map();
+function getBestAlbumOrder(genres, plays) {
+	const countPlays = countPlaysByGenres(genres, plays);
+	const sortedGenres = sortGenresByPlayCount(countPlays);
+	const groupedAlbums = groupAlbumsByGenre(genres, plays);
 
-	for (const [genre, indexes] of indexesBasedOnGenres) {
-		indexes.sort((a, b) => {
-			if (plays[a] !== plays[b]) {
-				return plays[b] - plays[a];
-			} else {
-				return a - b;
-			}
-		});
+	const bestAlbumOrder = sortedGenres.reduce((acc, genre) => {
+		const sortedAlbums = groupedAlbums[genre]
+			.sort((a, b) => b.play - a.play || a.id - b.id) // 재생횟수가 같은 경우 고유번호가 낮은 순으로 정렬한다
+			.slice(0, 2);
 
-		sortedIndexesBasedOnPlays.set(genre, indexes);
-	}
+		// 장르별로 2개씩 고유번호를 리턴한다
+		return [...acc, ...sortedAlbums.map((album) => album.id)];
+	}, []);
 
-	return sortedIndexesBasedOnPlays;
-}
-
-function getBestAlbum(
-	sortedTotalPlaysBasedOnGenres,
-	sortedIndexesBasedOnPlays
-) {
-	const bestAlbum = [];
-
-	for (const genre of sortedTotalPlaysBasedOnGenres) {
-		const indexes = sortedIndexesBasedOnPlays.get(genre);
-
-		bestAlbum.push(...indexes.slice(0, 2));
-	}
-
-	return bestAlbum;
+	return bestAlbumOrder;
 }
 
 function solution(genres, plays) {
-	const totalPlaysBasedOnGenres = getTotalPlaysBasedOnGenres(genres, plays);
-	const sortedTotalPlaysBasedOnGenres = getSortedTotalPlaysBasedOnGenres(
-		totalPlaysBasedOnGenres
-	);
-	const indexesBasedOnGenres = getIndexesBasedOnGenres(genres);
-	const sortedIndexesBasedOnPlays = getSortedIndexesBasedOnPlays(
-		indexesBasedOnGenres,
-		plays
-	);
-	const bestAlbum = getBestAlbum(
-		sortedTotalPlaysBasedOnGenres,
-		sortedIndexesBasedOnPlays
-	);
-
-	return bestAlbum;
+	return getBestAlbumOrder(genres, plays);
 }
