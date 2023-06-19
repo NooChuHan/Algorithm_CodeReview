@@ -16,7 +16,7 @@ function solution(genres, plays) {
       ? (totalPlayGenre[genre] = totalPlayGenre[genre] + plays[idx])
       : (totalPlayGenre[genre] = plays[idx])
   })
-
+  
   totalPlayGenre = Object.entries(totalPlayGenre).sort((a, b) => b[1] - a[1])
   infoForSongs = infoForSongs.sort((a, b) => b.playCnt - a.playCnt)
 
