@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 class Main{
     public static void main(String[] args) {
 
@@ -25,10 +27,14 @@ class Main{
 
 class Checker{
     public static <T> void testCaseChecker(T yourAnswer, T answer){
+        boolean isCorrect = false;
+
         if (yourAnswer.getClass().isArray() && answer.getClass().isArray()) {
-            return;
+            isCorrect = Arrays.deepEquals(new Object[]{yourAnswer}, new Object[]{answer});
+        } else {
+            isCorrect = yourAnswer.equals(answer);
         }
-        boolean isCorrect = yourAnswer.equals(answer);
+
         if(isCorrect){
             System.out.println("정답입니다.");
             System.out.println("answer = " + yourAnswer);
