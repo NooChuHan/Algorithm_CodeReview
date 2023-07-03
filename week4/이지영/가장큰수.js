@@ -1,5 +1,4 @@
 function solution(numbers) {
-  // 1차시도
   let answer = "";
   let arr = [];
   for (let i = 0; i < numbers.length; i++) {
