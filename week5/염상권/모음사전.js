@@ -25,8 +25,6 @@ const solution = (word) => {
     arr.push(...dfs(i));
   }
 
-  console.log(arr.length);
-
   const sortedArr = arr.sort();
   const answer = sortedArr.findIndex((element) => element === word) + 1;
 
