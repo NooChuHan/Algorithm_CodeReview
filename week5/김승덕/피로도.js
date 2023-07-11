@@ -10,7 +10,6 @@ function solution(k, dungeons) {
     const length = dungeons.length; // 던전 배열의 길이 저장
     const visited = Array(length).fill(false); // 던전 방문 여부를 저장하는 배열 생성 및 초기화
     let answer = 0; // 결과값을 저장할 변수
-    let temp = 0; // 임시 변수
 
     // 깊이 우선 탐색 함수 (DFS)
     const dfs = (currentK, cnt) => {
